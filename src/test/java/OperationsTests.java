@@ -1,5 +1,8 @@
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.assertEquals;
 
 public class OperationsTests {
@@ -50,5 +53,13 @@ public class OperationsTests {
             }
             assertEquals(7, Operations.getMax(sevenList));
             assertEquals(7, Operations.getMin(sevenList));
+        }
+        @Test
+        @Disabled
+        @Timeout(value = 1, unit = TimeUnit.SECONDS)
+        void testFailing() throws InterruptedException {
+            Thread.sleep(7777);
+            List<Integer> numbers = Arrays.asList(11,22,33,44);
+            assertEquals(351384, Operations.getMult(numbers));
         }
 }
