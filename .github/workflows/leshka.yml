@@ -33,11 +33,11 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          message: ":white_check_mark: Канье Вест очень рад!"
+          message: "Канье Вест очень рад!"
       - name: Send Telegram notification on failure
         if: failure()
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          message: ":x: Канье Вест в ахере!"
+          message: "Канье Вест в ахере!"
