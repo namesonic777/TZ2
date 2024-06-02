@@ -12,7 +12,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Set up JDK 21
         uses: actions/setup-java@v3
@@ -30,6 +31,22 @@ jobs:
 
       - name: Build and test with Maven
         run: mvn -B test --file pom.xml
+        continue-on-error: true
+
+      - name: Generate Test Report on Failure
+        if: failure()
+        run: |
+          echo "Test failures detected. Generating report..."
+          mkdir -p test-reports
+          cp target/surefire-reports/*.xml test-reports/
+          echo "Report generated at:"
+          ls test-reports
+
+      - name: Create Failed Test Report
+        if: failure()
+        run: |
+          set +e
+          grep -Ei -A 1 "(failure|error)" test-reports/*.xml > failed-test-report.xml
 
       - name: Send Telegram notification on success
         if: success()
@@ -37,7 +54,7 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          message: "Всё ок"
+          message: "All tests passed successfully!"
 
       - name: Send Telegram notification on failure
         if: failure()
@@ -54,8 +71,5 @@ jobs:
             Workflow: ${{ github.workflow }}
             Job: ${{ github.job }}
             📝 *Message:* Tests have failed in the CI pipeline.
-            [Check your Tests Results](${{
-              github.server_url
-            }}/${{ github.repository }}/actions/runs/${{
-              github.run_id
-            }})
+            [Check your Tests Results](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          document: failed-test-report.xml
