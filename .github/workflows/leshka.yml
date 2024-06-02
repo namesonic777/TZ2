@@ -1,59 +1,101 @@
 name: Java CI with Maven
-
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-      - name: Set up JDK 21
+      - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
       - name: Build with Maven
-        run: mvn -B package --file pom.xml
-
-      - name: Run Tests with Maven
-        run: mvn test --file pom.xml
-        continue-on-error: true
-
-      - name: Generate Test Report
+        run: mvn -B package --file pom.xml -DskipTests
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifact
+          path: target/
+      - name: Notify Telegram on failure build
         if: failure()
-        run: |
-          echo "Test failures detected. Generating report..."
-          mkdir -p test-reports
-          cp target/surefire-reports/*.xml test-reports/
-          echo "Copy result:"
-          ls test-reports
-
-      - name: Send success message to Telegram
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: markdown
+          message: |
+            *Билд с ошибкой ❌*
+      - name: Notify Telegram on success build
         if: success()
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          message: "Всё ок"
+          format: markdown
+          message: |
+            *Билд успешный ✅*
+            Репозиторий: ${{ github.repository }}
+            Коммит: ${{ github.sha }}
+            Актор: ${{ github.actor }}
+            Воркфлоу: ${{ github.workflow }}
+            Job: ${{ github.job }}
 
-      - name: Make failed test report
+  test:
+    runs-on: ubuntu-latest
+    env:
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifact
+          path: target/
+      - name: Test with Maven
+        run: mvn -B test --file pom.xml
+      - name: Save test results
         if: failure()
         run: |
-          set +e
-          grep -Ei -A 1 "(failure|error)" test-reports/*.xml > failed-test-report.xml
-
-      - name: Send failure message to Telegram
+          mkdir -p junit
+          cp target/surefire-reports/*.xml junit/
+      - name: Notify Telegram on failure
+        if: success()
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: markdown
+          message: "Все ок"
+      - name: Notify Telegram on success
         if: failure()
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          message: "Некоторые тесты не пройдены:"
-          document: failed-test-report.xml
+          format: markdown
+          message:  |
+            *Ошибка тестов*
+            Репозиторий: ${{ github.repository }}
+            Коммит: ${{ github.sha }}
+            Актор: ${{ github.actor }}
+            Воркфлоу: ${{ github.workflow }}
+            Job: ${{ github.job }}
+            📝 *Сообщение:* Тесты не прошли.
+            [Посмотреть результаты](${{
+            github.server_url
+            }}/${{ github.repository }}/actions/runs/${{
+            github.run_id
+            }})
