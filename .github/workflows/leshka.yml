@@ -51,7 +51,7 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          message: "Всё ок!"
+          message: "Всё ок"
 
       - name: Send Telegram notification on failure
         if: steps.test_result.outputs.failed == 'true'
