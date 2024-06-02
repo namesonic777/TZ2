@@ -33,11 +33,11 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          message: "Канье Вест очень рад!"
+          message: "Всё ок!"
       - name: Send Telegram notification on failure
         if: failure()
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          message: "Канье Вест в ахере!"
+          message: "Тесты завершены с ошибками! Неудавшиеся тесты: " ${{ steps.test_result.outputs.failed_tests }}
