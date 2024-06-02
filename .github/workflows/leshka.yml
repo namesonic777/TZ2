@@ -47,8 +47,7 @@ jobs:
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           format: markdown
           message: |
-            Неудавшиеся тесты:
-            (${{
+            [Неудавшиеся тесты:](${{
               github.server_url
             }}/${{ github.repository }}/actions/runs/${{
               github.run_id
