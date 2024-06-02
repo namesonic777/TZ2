@@ -36,7 +36,7 @@ jobs:
         run: |
           set -e
           mvn -B test --file pom.xml
-          echo "TEST_RESULT=$(grep -o 'Failures:[^,]*' target/surefire-reports/*.txt | grep -o '[0-9]\+')" >> $GITHUB_ENV
+          echo "TEST_RESULT=$(grep -o 'Failures:[^,]*' target/surefire-reports/*.xml | grep -o '[0-9]\+')" >> $GITHUB_ENV
 
       - name: Set test result outputs
         id: set_test_result
