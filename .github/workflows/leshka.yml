@@ -1,101 +1,59 @@
 name: Java CI with Maven
+
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
+
 jobs:
   build:
+
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up JDK 17
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
-      - name: Build with Maven
-        run: mvn -B package --file pom.xml -DskipTests
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: build-artifact
-          path: target/
-      - name: Notify Telegram on failure build
-        if: failure()
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.TELEGRAM_CHAT_ID }}
-          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          format: markdown
-          message: |
-            *Билд с ошибкой ❌*
-      - name: Notify Telegram on success build
-        if: success()
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.TELEGRAM_CHAT_ID }}
-          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          format: markdown
-          message: |
-            *Билд успешный ✅*
-            Репозиторий: ${{ github.repository }}
-            Коммит: ${{ github.sha }}
-            Актор: ${{ github.actor }}
-            Воркфлоу: ${{ github.workflow }}
-            Job: ${{ github.job }}
 
-  test:
-    runs-on: ubuntu-latest
-    env:
-      ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-    needs: build
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
+      - name: Cache Maven packages
+        uses: actions/cache@v3
         with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: maven
-      - name: Download build artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: build-artifact
-          path: target/
-      - name: Test with Maven
-        run: mvn -B test --file pom.xml
-      - name: Save test results
-        if: failure()
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Build with Maven
+        run: mvn -B clean install --file pom.xml
+
+      - name: Run tests with Maven
+        id: run_tests
         run: |
-          mkdir -p junit
-          cp target/surefire-reports/*.xml junit/
-      - name: Notify Telegram on failure
-        if: success()
+          set -e
+          mvn -B test --file pom.xml
+          echo "TEST_RESULT=$(grep -o 'Failures:[^,]*' target/surefire-reports/*.txt | grep -o '[0-9]\+')" >> $GITHUB_ENV
+
+      - name: Set test result outputs
+        id: set_test_result
+        run: echo "::set-output name=failed_tests::$TEST_RESULT"
+
+      - name: Send Telegram notification on success
+        if: steps.set_test_result.outputs.failed_tests == '0'
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          format: markdown
-          message: "Все ок"
-      - name: Notify Telegram on success
-        if: failure()
+          message: "Всё ок"
+
+      - name: Send Telegram notification on failure
+        if: steps.set_test_result.outputs.failed_tests != '0'
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          format: markdown
-          message:  |
-            *Ошибка тестов*
-            Репозиторий: ${{ github.repository }}
-            Коммит: ${{ github.sha }}
-            Актор: ${{ github.actor }}
-            Воркфлоу: ${{ github.workflow }}
-            Job: ${{ github.job }}
-            📝 *Сообщение:* Тесты не прошли.
-            [Посмотреть результаты](${{
-            github.server_url
-            }}/${{ github.repository }}/actions/runs/${{
-            github.run_id
-            }})
+          message: "Неудавшиеся тесты: ${{ steps.set_test_result.outputs.failed_tests }}"
