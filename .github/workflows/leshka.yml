@@ -37,7 +37,7 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          message: "Всё ок!"
+          message: "Всё ок"
 
       - name: Send Telegram notification on failure
         if: failure()
@@ -47,13 +47,7 @@ jobs:
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           format: markdown
           message: |
-            🛑 *Test Failure Notification* 🛑
-            Repository: ${{ github.repository }}
-            Commit: ${{ github.sha }}
-            Committer: ${{ github.actor }}
-            Workflow: ${{ github.workflow }}
-            Job: ${{ github.job }}
-            📝 *Message:* Tests have failed in the CI pipeline.
+            Неудавшиеся тесты:
             [Check your Tests Results](${{
               github.server_url
             }}/${{ github.repository }}/actions/runs/${{
