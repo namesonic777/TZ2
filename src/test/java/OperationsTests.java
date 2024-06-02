@@ -1,31 +1,32 @@
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import static org.junit.Assert.assertEquals;
+
 
 public class OperationsTests {
 
         @Test
         void testMin() {
             List<Integer> numbers = Arrays.asList(7, -7, 77, -77);
-            assertEquals(-77, Operations.getMin(numbers));
+            Assertions.assertEquals(-77, Operations.getMin(numbers));
         }
         @Test
         void testMax() {
             List<Integer> numbers = Arrays.asList(7, -7, 77, -77);
-            assertEquals(77, Operations.getMax(numbers));
+            Assertions.assertEquals(77, Operations.getMax(numbers));
         }
         @Test
         void testSum() {
             List<Integer> numbers = Arrays.asList(7, -7, 77, -77);
-            assertEquals(0, Operations.getSum(numbers));
+            Assertions.assertEquals(0, Operations.getSum(numbers));
         }
         @Test
         void testMult() {
             List<Integer> numbers = Arrays.asList(7, -7, 77, -77);
-            assertEquals(290521, Operations.getMult(numbers));
+            Assertions.assertEquals(290521, Operations.getMult(numbers));
         }
         @Test
         void testTime() {
@@ -51,14 +52,14 @@ public class OperationsTests {
             for (int i = 0; i < 77; i++) {
                 sevenList.add(7);
             }
-            assertEquals(7, Operations.getMax(sevenList));
-            assertEquals(7, Operations.getMin(sevenList));
+            Assertions.assertEquals(7, Operations.getMax(sevenList));
+            Assertions.assertEquals(7, Operations.getMin(sevenList));
         }
         @Test
-        @Timeout(value = 7777, unit = TimeUnit.SECONDS)
+        @Timeout(value = 1, unit = TimeUnit.SECONDS)
         void testFailing() throws InterruptedException {
             Thread.sleep(7777);
-//            List<Integer> numbers = Arrays.asList(11,22,33,44);
-//            assertEquals(351384, Operations.getMult(numbers));
+            List<Integer> numbers = Arrays.asList(11,22,33,44);
+            Assertions.assertEquals(351384, Operations.getMult(numbers));
         }
 }
