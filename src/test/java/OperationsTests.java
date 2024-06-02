@@ -60,6 +60,6 @@ public class OperationsTests {
         void testFailing() throws InterruptedException {
             Thread.sleep(7777);
             List<Integer> numbers = Arrays.asList(11,22,33,44);
-            Assertions.assertEquals(351384, Operations.getMult(numbers));
+            Assertions.assertEquals(111, Operations.getMult(numbers));
         }
 }
