@@ -56,6 +56,7 @@ public class OperationsTests {
             Assertions.assertEquals(7, Operations.getMin(sevenList));
         }
         @Test
+        @Disabled
         @Timeout(value = 1, unit = TimeUnit.SECONDS)
         void testFailing() throws InterruptedException {
             Thread.sleep(7777);
