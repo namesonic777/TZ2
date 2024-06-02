@@ -2,9 +2,9 @@ name: Java CI with Maven
 
 on:
   push:
-    branches: ["main"]
+    branches: [ "main" ]
   pull_request:
-    branches: ["main"]
+    branches: [ "main" ]
 
 jobs:
   build:
@@ -13,47 +13,44 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
       - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
-
       - name: Cache Maven packages
         uses: actions/cache@v3
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-
-      - name: Build with Maven
-        run: mvn -B clean install --file pom.xml
-
-      - name: Run tests with Maven
-        id: run_tests
-        run: |
-          set -e
-          mvn -B test --file pom.xml
-          echo "TEST_RESULT=$(grep -o 'Failures:[^,]*' target/surefire-reports/*.xml | grep -o '[0-9]\+')" >> $GITHUB_ENV
-
-      - name: Set test result outputs
-        id: set_test_result
-        run: echo "::set-output name=failed_tests::$TEST_RESULT"
-
+      - name: Build and test with Maven
+        run: mvn -B test --file pom.xml
       - name: Send Telegram notification on success
-        if: steps.set_test_result.outputs.failed_tests == '0'
+        if: success()
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          message: "Всё ок"
-
+          message: "Всё ок!"
       - name: Send Telegram notification on failure
-        if: steps.set_test_result.outputs.failed_tests != '0'
+        if: failure()
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          message: "Неудавшиеся тесты: ${{ steps.set_test_result.outputs.failed_tests }}"
+          format: markdown
+          message: |
+          :octagonal_sign: *Test Failure Notification* :octagonal_sign:
+          Repository: ${{ github.repository }}
+          Commit: ${{ github.sha }}
+          Committer: ${{ github.actor }}
+          Workflow: ${{ github.workflow }}
+          Job: ${{ github.job }}
+          :pencil: *Message:* Tests have failed in the CI pipeline.
+          [Check your Tests Results](${{
+          github.server_url
+          }}/${{ github.repository }}/actions/runs/${{
+          github.run_id
+          }})
