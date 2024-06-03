@@ -2,10 +2,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
-
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-
+import java.io.BufferedReader;
+import java.io.FileReader;
 
 public class OperationsTests {
 
@@ -34,88 +35,173 @@ public class OperationsTests {
     }
 
     @Test
-    void testTime() {
-        List<Integer> largeList = new ArrayList<>();
-        for (int i = 0; i < 5000000; i++) {
-            largeList.add(i);
+    void testTimeLilMin() throws IOException {
+        List<Integer> numbersList = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/10.txt"))) {
+            String line = reader.readLine();
+            if (line != null) {
+                String[] stringArray = line.split(" ");
+                for (String number : stringArray) {
+                    numbersList.add(Integer.parseInt(number));
+                }
+            }
         }
-        long T1 = System.currentTimeMillis();
+        long T1 = System.nanoTime();
 
-        Operations.getMin(largeList);
-        Operations.getMax(largeList);
-        Operations.getSum(largeList);
-        Operations.getMult(largeList);
+        Operations.getMin(numbersList);
 
-        long T2 = System.currentTimeMillis();
-        long duration = T2 - T1;
+        long T2 = System.nanoTime();
+        long duration = (T2 - T1) / 1_000_000;
 
-        System.out.println("Время выполнения: " + duration + " мс");
+        System.out.println("Время поиска минимума для файла с десятью числами: " + duration + " мс");
     }
-
     @Test
-    void testTimeMin() {
-        List<Integer> largeList = new ArrayList<>();
-        for (int i = 0; i < 5000000; i++) {
-            largeList.add(i);
+    void testTimeLilMax() throws IOException {
+        List<Integer> numbersList = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/10.txt"))) {
+            String line = reader.readLine();
+            if (line != null) {
+                String[] stringArray = line.split(" ");
+                for (String number : stringArray) {
+                    numbersList.add(Integer.parseInt(number));
+                }
+            }
         }
-        long T1 = System.currentTimeMillis();
+        long T1 = System.nanoTime();
 
-        Operations.getMin(largeList);
+        Operations.getMax(numbersList);
 
-        long T2 = System.currentTimeMillis();
-        long duration = T2 - T1;
+        long T2 = System.nanoTime();
+        long duration = (T2 - T1) / 1_000_000;
 
-        System.out.println("Время поиска минимума: " + duration + " мс");
+        System.out.println("Время поиска максимума для файла с десятью числами: " + duration + " мс");
     }
-
     @Test
-    void testTimeMax() {
-        List<Integer> largeList = new ArrayList<>();
-        for (int i = 0; i < 5000000; i++) {
-            largeList.add(i);
+    void testTimeLilSum() throws IOException {
+        List<Integer> numbersList = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/10.txt"))) {
+            String line = reader.readLine();
+            if (line != null) {
+                String[] stringArray = line.split(" ");
+                for (String number : stringArray) {
+                    numbersList.add(Integer.parseInt(number));
+                }
+            }
         }
-        long T1 = System.currentTimeMillis();
+        long T1 = System.nanoTime();
 
-        Operations.getMax(largeList);
+        Operations.getSum(numbersList);
 
-        long T2 = System.currentTimeMillis();
-        long duration = T2 - T1;
+        long T2 = System.nanoTime();
+        long duration = (T2 - T1) / 1_000_000;
 
-        System.out.println("Время поиска максимума: " + duration + " мс");
+        System.out.println("Время вычисления суммы всех чисел для файла с десятью числами: " + duration + " мс");
     }
-
     @Test
-    void testTimeSum() {
-        List<Integer> largeList = new ArrayList<>();
-        for (int i = 0; i < 5000000; i++) {
-            largeList.add(i);
+    void testTimeLilMult() throws IOException {
+        List<Integer> numbersList = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/10.txt"))) {
+            String line = reader.readLine();
+            if (line != null) {
+                String[] stringArray = line.split(" ");
+                for (String number : stringArray) {
+                    numbersList.add(Integer.parseInt(number));
+                }
+            }
         }
-        long T1 = System.currentTimeMillis();
+        long T1 = System.nanoTime();
 
-        Operations.getSum(largeList);
+        Operations.getMult(numbersList);
 
-        long T2 = System.currentTimeMillis();
-        long duration = T2 - T1;
+        long T2 = System.nanoTime();
+        long duration = (T2 - T1) / 1_000_000;
 
-        System.out.println("Время вычисления суммы всех чисел в файле: " + duration + " мс");
+        System.out.println("Время вычисления произведения всех чисел для файла с десятью числами: " + duration + " мс");
     }
-
     @Test
-    void testTimeMult() {
-        List<Integer> largeList = new ArrayList<>();
-        for (int i = 0; i < 5000000; i++) {
-            largeList.add(i);
+    void testTimeLargeMin() throws IOException {
+        List<Integer> numbersList = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/100000.txt"))) {
+            String line = reader.readLine();
+            if (line != null) {
+                String[] stringArray = line.split(" ");
+                for (String number : stringArray) {
+                    numbersList.add(Integer.parseInt(number));
+                }
+            }
         }
-        long T1 = System.currentTimeMillis();
+        long T1 = System.nanoTime();
 
-        Operations.getMult(largeList);
+        Operations.getMin(numbersList);
 
-        long T2 = System.currentTimeMillis();
-        long duration = T2 - T1;
+        long T2 = System.nanoTime();
+        long duration = (T2 - T1) / 1_000_000;
 
-        System.out.println("Время вычисления произведения всех чисел в файле: " + duration + " мс");
+        System.out.println("Время поиска минимума для файла со ста тысячами чисел: " + duration + " мс");
     }
+    @Test
+    void testTimeLargeMax() throws IOException {
+        List<Integer> numbersList = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/100000.txt"))) {
+            String line = reader.readLine();
+            if (line != null) {
+                String[] stringArray = line.split(" ");
+                for (String number : stringArray) {
+                    numbersList.add(Integer.parseInt(number));
+                }
+            }
+        }
+        long T1 = System.nanoTime();
 
+        Operations.getMax(numbersList);
+
+        long T2 = System.nanoTime();
+        long duration = (T2 - T1) / 1_000_000;
+
+        System.out.println("Время поиска максимума для файла со ста тысячами чисел: " + duration + " мс");
+    }
+    @Test
+    void testTimeLargeSum() throws IOException {
+        List<Integer> numbersList = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/100000.txt"))) {
+            String line = reader.readLine();
+            if (line != null) {
+                String[] stringArray = line.split(" ");
+                for (String number : stringArray) {
+                    numbersList.add(Integer.parseInt(number));
+                }
+            }
+        }
+        long T1 = System.nanoTime();
+
+        Operations.getSum(numbersList);
+
+        long T2 = System.nanoTime();
+        long duration = (T2 - T1) / 1_000_000;
+
+        System.out.println("Время вычисления суммы всех чисел для файла со ста тысячами чисел: " + duration + " мс");
+    }
+    @Test
+    void testTimeLargeMult() throws IOException {
+        List<Integer> numbersList = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/100000.txt"))) {
+            String line = reader.readLine();
+            if (line != null) {
+                String[] stringArray = line.split(" ");
+                for (String number : stringArray) {
+                    numbersList.add(Integer.parseInt(number));
+                }
+            }
+        }
+        long T1 = System.nanoTime();
+
+        Operations.getMult(numbersList);
+
+        long T2 = System.nanoTime();
+        long duration = (T2 - T1) / 1_000_000;
+
+        System.out.println("Время вычисления произведения всех чисел для файла со ста тысячами чисел: " + duration + " мс");
+    }
     @Test
     void testIsSeven() {
         List<Integer> sevenList = new ArrayList<>();
