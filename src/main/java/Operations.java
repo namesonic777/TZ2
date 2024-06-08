@@ -1,21 +1,19 @@
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class Operations {
-    public static void main(String[] args) throws FileNotFoundException {
-        File inputFile = new File("sonya.txt");
-        Scanner fileScanner = new Scanner(inputFile);
-        List<Integer> numberList = new ArrayList<>();
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader("sonya.txt"));
+        ArrayList<Integer> numberList = new ArrayList<>();
+        String[] stringNumberList = reader.readLine().split(" ");
 
-        if (fileScanner.hasNextLine()) {
-            String[] stringNumbers = fileScanner.nextLine().split(" ");
-            for (String stringNumber : stringNumbers) {
-                numberList.add(Integer.parseInt(stringNumber));
+        for (int i = 0; i < stringNumberList.length; i++) {
+            numberList.add(Integer.parseInt(stringNumberList[i]));
+
             }
-        }
         int minimum = getMin(numberList);
         int maximum = getMax(numberList);
         long sum = getSum(numberList);
@@ -25,36 +23,35 @@ public class Operations {
         System.out.println("Максимальное: " + maximum);
         System.out.println("Сумма: " + sum);
         System.out.println("Произведение: " + multiply);
-        fileScanner.close();
     }
-    public static int getMin(List<Integer> numbers) {
+    public static int getMin(List<Integer> numberList) {
         int min = Integer.MAX_VALUE;
-        for (int number : numbers) {
+        for (int number : numberList) {
             if (number < min) {
                 min = number;
             }
         }
         return min;
     }
-    public static int getMax(List<Integer> numbers) {
+    public static int getMax(List<Integer> numberList) {
         int max = Integer.MIN_VALUE;
-        for (int number : numbers) {
+        for (int number : numberList) {
             if (number > max) {
                 max = number;
             }
         }
         return max;
     }
-    public static long getSum(List<Integer> numbers) {
+    public static long getSum(List<Integer> numberList) {
         long sum = 0;
-        for (int number : numbers) {
+        for (int number : numberList) {
             sum += number;
         }
         return sum;
     }
-    public static long getMult(List<Integer> numbers) {
+    public static long getMult(List<Integer> numberList) {
         long mult = 1;
-        for (int number : numbers) {
+        for (int number : numberList) {
             mult *= number;
         }
         return mult;
